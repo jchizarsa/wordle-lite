@@ -1,0 +1,30 @@
+services:
+  wordle-lite:
+    image: wordle-lite
+    build:
+      context: .
+      dockerfile: ./Dockerfiles/wordle-lite/Dockerfile
+    environment:
+      NODE_ENV: development
+      CHOKIDAR_USEPOLLING: "true"
+      WATCHPACK_POLLING: "true"
+    volumes:
+      # - ./node_modules:/app/node_modules
+      - ./src:/app/src
+    ports:
+      - 3000:3000
+    # networks:
+    #   - app-to-json-server
+  json-server:
+    image: json-server
+    build:
+      context: .
+      dockerfile: ./Dockerfiles/json-server/Dockerfile
+    ports:
+      - 3001:3001
+    # networks:
+    # - app-to-json-server
+
+# networks:
+#   app-to-json-server:
+#     driver: bridge

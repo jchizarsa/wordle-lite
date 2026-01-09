@@ -1,9 +1,12 @@
 import {useState} from 'react'
 
 const useWordle = (solution) => {
+    const guessLimit = 6
+    const wordLength = 5
+
     const [turn, setTurn] = useState(0)
     const [currentGuess, setCurrentGuess] = useState('')
-    const [guesses, setGuesses] = useState([])
+    const [guesses, setGuesses] = useState([...Array(guessLimit)]) // Creates an empty array of length 6
     const [history, setHistory] = useState([])
     const [isCorrect, setIsCorrect] = useState(false)
 
@@ -32,14 +35,28 @@ const useWordle = (solution) => {
         return formattedGuess
     }
 
-    const addNewGuess = () => {
-
+    const addNewGuess = (formattedGuess) => {
+        if( currentGuess === solution) {
+            setIsCorrect(true)
+        }
+        setGuesses((prevGuesses) => {
+            let newGuesses = [...prevGuesses]
+            newGuesses[turn] = formattedGuess
+            return newGuesses
+        })
+        setHistory((prevHistory) => {
+            return[...prevHistory, currentGuess]
+        })
+        setTurn((prevTurn) => {
+            return prevTurn + 1
+        })
+        setCurrentGuess('')
     }
 
     const handleKeyup = ({ key }) => {
         if (key === 'Enter') {
             // only add guess if turn < 5
-            if (turn > 5) {
+            if (turn >= guessLimit) {
                 console.log('No guesses remaining')
                 return
             }
@@ -49,13 +66,13 @@ const useWordle = (solution) => {
                 return
             }
             // check word is 5 chars long
-            if (currentGuess.length !== 5) {
+            if (currentGuess.length !== wordLength) {
                 console.log('must be 5 chars long')
                 return
             }
 
             const formatted = formatGuess()
-            console.log(formatted)
+            addNewGuess(formatted)
         }
 
         if (key === 'Backspace') {
@@ -65,7 +82,7 @@ const useWordle = (solution) => {
         }
         
         if (/^[A-Za-z]$/.test(key)) {
-            if(currentGuess.length < 5) {
+            if(currentGuess.length < wordLength) {
                 setCurrentGuess((prev) => {
                     return prev + key
                 })
